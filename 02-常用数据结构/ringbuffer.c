@@ -1,17 +1,8 @@
 ﻿#include "stdint.h"
 #include "string.h"
+#include "ringbuffer.h"
 
-#define BUFFER_SIZE 1024
-
-struct queue_t
-{
-    uint16_t head;
-    uint16_t tail;
-    uint16_t used_len;
-    uint16_t free_len;
-    uint8_t buffer[BUFFER_SIZE];
-};
-
+// Initialize the queue
 uint8_t queue_Init(struct queue_t *p_queue)
 {
     if(p_queue == NULL)
@@ -24,6 +15,7 @@ uint8_t queue_Init(struct queue_t *p_queue)
     return 1;
 }
 
+// Check if the queue is full
 uint8_t queue_IsFull(struct queue_t *p_queue)
 {
     if(p_queue == NULL)
@@ -34,6 +26,7 @@ uint8_t queue_IsFull(struct queue_t *p_queue)
     return (((p_queue->head + 1) % BUFFER_SIZE == p_queue->tail) ? 1 : 0);
 }
 
+// Check if the queue is empty
 uint8_t queue_IsEmpty(struct queue_t *p_queue)
 {
     if(p_queue == NULL)
@@ -44,6 +37,7 @@ uint8_t queue_IsEmpty(struct queue_t *p_queue)
     return (p_queue->head == p_queue->tail ? 1 : 0);
 }
 
+// Get the number of used bytes in the queue
 uint16_t queue_used_size(struct queue_t *p_queue)
 {
     if(p_queue == NULL)
@@ -54,6 +48,7 @@ uint16_t queue_used_size(struct queue_t *p_queue)
     return (p_queue->head >= p_queue->tail ? p_queue->head - p_queue->tail : (BUFFER_SIZE - p_queue->tail + p_queue->head));
 }
 
+// Get the number of free bytes in the queue
 uint16_t queue_free_size(struct queue_t *p_queue)
 {
     if(p_queue == NULL)
@@ -64,6 +59,7 @@ uint16_t queue_free_size(struct queue_t *p_queue)
     return (BUFFER_SIZE - queue_used_size(p_queue) - 1);
 }
 
+// Write data to the queue
 uint8_t queue_write(struct queue_t *p_queue, const uint8_t *p_items, uint16_t items_size)
 {
     if(p_queue == NULL || p_items == NULL)
@@ -84,6 +80,7 @@ uint8_t queue_write(struct queue_t *p_queue, const uint8_t *p_items, uint16_t it
     }
 }
 
+// Read data from the queue
 uint8_t queue_read(struct queue_t *p_queue, uint8_t *p_items, uint16_t items_size)
 {
     if(p_queue == NULL || p_items == NULL)
